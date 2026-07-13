@@ -1,0 +1,116 @@
+@import url("https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&display=swap");
+
+.game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 32px 20px;
+}
+
+.word-list-card {
+  width: min(100%, 340px);
+  background: #fff;
+  border-radius: 22px;
+  padding: 28px 24px 32px;
+  box-shadow:
+    0 12px 28px rgba(26, 35, 126, 0.12),
+    0 0 0 1px rgba(26, 35, 126, 0.06);
+}
+
+.word-list-title {
+  margin: 0 0 24px;
+  font-family: "Oswald", "Arial Narrow", sans-serif;
+  font-size: 3rem;
+  font-weight: 700;
+  text-align: center;
+  color: #1a237e;
+  line-height: 1;
+}
+
+.word-list-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.word-list-section {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 28px;
+  color: #fff;
+  border-radius: 12px;
+}
+
+.word-list-section--1 {
+  min-height: 118px;
+  background: #ff5722;
+}
+
+.word-list-section--2 {
+  min-height: 92px;
+  background: #e91e63;
+}
+
+.word-list-section--3 {
+  min-height: 68px;
+  background: #1a237e;
+}
+
+.word-list-badge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 2px solid #111;
+  border-radius: 50%;
+  background: #fff;
+  color: #111;
+  font-family: "Oswald", "Arial Narrow", sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.word-list-words {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  gap: 6px;
+  font-family: "Oswald", "Arial Narrow", sans-serif;
+  font-size: 1.65rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.word-list-word {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  width: 100%;
+}
+
+.word-list-word-initial {
+  font-size: 1.2em;
+  line-height: 1;
+  margin-right: 0.02em;
+}
+
+@media (prefers-color-scheme: dark) {
+  .word-list-card {
+    background: #fff;
+    box-shadow:
+      0 16px 32px rgba(0, 0, 0, 0.35),
+      0 0 0 1px rgba(255, 255, 255, 0.08);
+  }
+}
