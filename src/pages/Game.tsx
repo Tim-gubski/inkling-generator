@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import wordsByLength from "../assets/wordlist/words-by-length.json";
 import "./Game.css";
-import GuessModal from "../components/GuessModal";
+import ScorecardModal from "../components/ScorecardModal";
 
 type WordsByLength = Record<string, string[]>;
 
@@ -40,6 +40,11 @@ function WordLabel({ word }: { word: string }) {
 
 function Game() {
   const [words, setWords] = useState<Record<string, string> | null>(null);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    setWords(pickRandomWords());
+  }, []);
 
   return (
     <div className="game">
@@ -74,11 +79,19 @@ function Game() {
       )}
       <div>
         <h2>Guesses</h2>
-        <h2>&lt;- -&gt;</h2>
-        <button>Left</button>
-        <button>Right</button>
+        <button
+          onClick={() => {
+            setIsOpen(true);
+          }}
+        >
+          Open Score Card
+        </button>
       </div>
-      <GuessModal />
+      <ScorecardModal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        numRows={7}
+      />
     </div>
   );
 }

@@ -1,0 +1,382 @@
+/* ScorecardModal.css
+   Purple "notepad scorecard" theme, mimicking a printed guessing-game pad. */
+
+.sc-overlay {
+  --sc-ink: #4934a6;
+  --sc-ink-soft: #9187c9;
+  --sc-placeholder: #e3ddf4;
+  --sc-footer-bg: #4934a6;
+  --sc-paper: #ffffff;
+  --sc-shadow: rgba(30, 20, 70, 0.35);
+
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 14, 46, 0);
+  backdrop-filter: blur(0px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 1000;
+  transition:
+    background-color 0.28s ease,
+    backdrop-filter 0.28s ease;
+}
+
+.sc-overlay--visible {
+  background: rgba(20, 14, 46, 0.55);
+  backdrop-filter: blur(2px);
+}
+
+.sc-card {
+  position: relative;
+  width: 100%;
+  max-width: 720px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: var(--sc-paper);
+  border-radius: 14px;
+  box-shadow: 0 24px 60px var(--sc-shadow);
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+
+  /* Hidden state: slid down below its resting position and faded out. */
+  opacity: 0;
+  transform: translateY(64px);
+  transition:
+    transform 0.28s cubic-bezier(0.22, 0.9, 0.32, 1),
+    opacity 0.22s ease;
+}
+
+.sc-card--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Torn / perforated notepad strip along the top edge */
+.sc-torn-edge {
+  height: 12px;
+  width: 100%;
+  background-image:
+    linear-gradient(135deg, #cfc9e6 25%, transparent 25%),
+    linear-gradient(225deg, #cfc9e6 25%, transparent 25%);
+  background-size: 16px 16px;
+  background-position: 0 0;
+  border-radius: 14px 14px 0 0;
+}
+
+.sc-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  z-index: 5;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--sc-ink-soft);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 50%;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.sc-close-btn:hover,
+.sc-close-btn:focus-visible {
+  background: var(--sc-placeholder);
+  color: var(--sc-ink);
+  outline: none;
+}
+
+.sc-body {
+  position: relative;
+  padding: 28px 28px 20px;
+}
+
+.sc-corner-arrow {
+  position: absolute;
+  top: 14px;
+  left: 18px;
+  width: 44px;
+  height: 44px;
+  color: var(--sc-ink-soft);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.sc-corner-arrow--flip {
+  left: auto;
+  right: 18px;
+  transform: scaleX(-1);
+}
+
+.sc-columns {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0 18px;
+}
+
+.sc-center-divider {
+  width: 2px;
+  background: var(--sc-ink);
+  opacity: 0.85;
+  border-radius: 1px;
+}
+
+.sc-column {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sc-column-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding-top: 30px;
+}
+
+.sc-column-label {
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sc-ink-soft);
+  font-size: 15px;
+}
+
+.sc-name-input {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--sc-placeholder);
+  border: none;
+  border-radius: 4px;
+  padding: 8px 10px;
+  font-size: 14px;
+  color: var(--sc-ink);
+  text-align: center;
+  font-weight: 600;
+}
+
+.sc-name-input::placeholder {
+  color: var(--sc-ink-soft);
+  opacity: 0.7;
+}
+
+.sc-name-input:focus {
+  outline: 2px solid var(--sc-ink);
+  outline-offset: 1px;
+  background: var(--sc-paper);
+}
+
+.sc-subheader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  color: var(--sc-ink);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+
+.sc-subheader-label {
+  flex-shrink: 0;
+}
+
+.sc-subheader-label--pts {
+  margin-left: auto;
+}
+
+.sc-subheader-line {
+  flex: 1;
+  height: 2px;
+  background: var(--sc-ink);
+  position: relative;
+  margin: 0 4px;
+}
+
+.sc-subheader-line::after {
+  content: "";
+  position: absolute;
+  right: -1px;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform: translateY(-50%);
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 7px solid var(--sc-ink);
+}
+
+.sc-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sc-row {
+  display: flex;
+  align-items: stretch;
+  border: 2.5px solid var(--sc-ink);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--sc-paper);
+}
+
+.sc-guess-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  border-right: 2px dashed var(--sc-ink);
+  padding: 12px 10px;
+  font-size: 14px;
+  color: #2a2050;
+  background: transparent;
+}
+
+.sc-pts-input {
+  width: 58px;
+  flex-shrink: 0;
+  border: none;
+  padding: 12px 6px;
+  font-size: 14px;
+  text-align: center;
+  color: #2a2050;
+  background: transparent;
+}
+
+.sc-guess-input:focus,
+.sc-pts-input:focus {
+  outline: none;
+  background: var(--sc-placeholder);
+}
+
+.sc-subtotal-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding-bottom: 4px;
+}
+
+.sc-subtotal-input {
+  width: 48px;
+  height: 48px;
+  border: 2.5px solid var(--sc-ink);
+  border-radius: 8px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--sc-ink);
+  background: var(--sc-paper);
+}
+
+.sc-subtotal-input:focus {
+  outline: none;
+  background: var(--sc-placeholder);
+}
+
+.sc-plus {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--sc-ink);
+}
+
+.sc-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: var(--sc-footer-bg);
+  padding: 16px 24px;
+  border-radius: 0 0 14px 14px;
+  flex-wrap: wrap;
+}
+
+.sc-footer-name,
+.sc-footer-total {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sc-footer-name {
+  flex: 1;
+  min-width: 220px;
+}
+
+.sc-footer-label {
+  color: #ffffff;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 13px;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.sc-footer-input {
+  border: none;
+  border-radius: 4px;
+  padding: 9px 10px;
+  font-size: 14px;
+  color: #2a2050;
+  background: #ffffff;
+}
+
+.sc-footer-input--name {
+  flex: 1;
+  min-width: 140px;
+}
+
+.sc-footer-input--total {
+  width: 90px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.sc-footer-input:focus {
+  outline: 2px solid #ffffff;
+  outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sc-overlay,
+  .sc-card {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* Responsive: stack the two player columns on narrow screens */
+@media (max-width: 560px) {
+  .sc-columns {
+    grid-template-columns: 1fr;
+    gap: 28px 0;
+  }
+
+  .sc-center-divider {
+    width: 100%;
+    height: 2px;
+  }
+
+  .sc-corner-arrow {
+    width: 32px;
+    height: 32px;
+  }
+
+  .sc-body {
+    padding: 24px 16px 16px;
+  }
+
+  .sc-footer {
+    justify-content: center;
+  }
+}
