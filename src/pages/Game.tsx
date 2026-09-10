@@ -55,11 +55,11 @@ function Game() {
   return (
     <div className="game">
       <button
-        className="counter"
+        className="app-button pick-words-btn"
         type="button"
         onClick={() => setWords(pickRandomWords())}
       >
-        Pick words
+        New Words
       </button>
       {words && (
         <article className="word-list-card">
@@ -83,16 +83,13 @@ function Game() {
           </div>
         </article>
       )}
-      <div>
-        <h2>Guesses</h2>
-        <button
-          onClick={() => {
-            setIsOpen(true);
-          }}
-        >
-          Open Score Card
-        </button>
-      </div>
+      <button
+        type="button"
+        className="app-button open-scorecard-btn"
+        onClick={() => setIsOpen(true)}
+      >
+        Open Score Card
+      </button>
       <ScorecardModal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
