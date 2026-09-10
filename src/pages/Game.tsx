@@ -24,6 +24,7 @@ function pickRandomWords(): Record<string, string> {
     const words = (wordsByLength as WordsByLength)[length];
     picks[length] = words[Math.floor(Math.random() * words.length)];
   }
+  localStorage.setItem("words", JSON.stringify(picks));
   return picks;
 }
 
@@ -43,7 +44,12 @@ function Game() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    setWords(pickRandomWords());
+    const savedWords = localStorage.getItem("words");
+    if (savedWords) {
+      setWords(JSON.parse(savedWords));
+    } else {
+      setWords(pickRandomWords());
+    }
   }, []);
 
   return (

@@ -8,16 +8,22 @@ export interface ScorecardRow {
 
 export interface ScorecardData {
   yourName: string;
+  /** Sum of all four subtotals (2 auto-calculated + 2 manual). Read-only. */
+  total: number;
   left: {
     name: string;
     rows: ScorecardRow[];
-    subtotalA: string;
+    /** Auto-calculated sum of this column's Pts. Read-only. */
+    subtotalA: number;
+    /** Manually entered by the player. */
     subtotalB: string;
   };
   right: {
     name: string;
     rows: ScorecardRow[];
-    subtotalA: string;
+    /** Auto-calculated sum of this column's Pts. Read-only. */
+    subtotalA: number;
+    /** Manually entered by the player. */
     subtotalB: string;
   };
 }
@@ -32,6 +38,13 @@ export interface ScorecardModalProps {
   /** Optional callback fired with the current form contents whenever something changes. */
   onChange?: (data: ScorecardData) => void;
 }
+
+/** Counts alphabetic characters only — spaces, digits, and punctuation don't count as letters. */
+const countLetters = (text: string): number => (text.match(/[a-zA-Z]/g) ?? []).length;
+
+/** Sums the Pts column for a set of rows, treating blank/invalid entries as 0. */
+const sumPts = (rows: ScorecardRow[]): number =>
+  rows.reduce((total, row) => total + (Number(row.pts) || 0), 0);
 
 const emptyRows = (count: number): ScorecardRow[] =>
   Array.from({ length: count }, () => ({ guess: "", pts: "" }));
@@ -70,18 +83,25 @@ export const ScorecardModal: React.FC<ScorecardModalProps> = ({
 
   const [leftName, setLeftName] = useState("");
   const [leftRows, setLeftRows] = useState<ScorecardRow[]>(emptyRows(numRows));
-  const [leftSubA, setLeftSubA] = useState("");
   const [leftSubB, setLeftSubB] = useState("");
 
   const [rightName, setRightName] = useState("");
-  const [rightRows, setRightRows] = useState<ScorecardRow[]>(
-    emptyRows(numRows),
-  );
-  const [rightSubA, setRightSubA] = useState("");
+  const [rightRows, setRightRows] = useState<ScorecardRow[]>(emptyRows(numRows));
   const [rightSubB, setRightSubB] = useState("");
+
+  // Auto-calculated: each column's subtotal A is the sum of its Pts entries,
+  // and the grand total is the sum of all four subtotals (2 auto + 2 manual).
+  const leftSubA = sumPts(leftRows);
+  const rightSubA = sumPts(rightRows);
+  const total = leftSubA + (Number(leftSubB) || 0) + rightSubA + (Number(rightSubB) || 0);
 
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const rafRef = useRef<number>(0);
+  const clearConfirmTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // "Clear" requires a second click within a few seconds to confirm, so a
+  // stray click doesn't wipe out everything someone just filled in.
+  const [confirmingClear, setConfirmingClear] = useState(false);
 
   // Controls mount/unmount (stays true a beat longer than isOpen so the
   // closing animation has time to play) and the visible flag that drives
@@ -108,10 +128,9 @@ export const ScorecardModal: React.FC<ScorecardModalProps> = ({
     }
 
     setVisible(false);
-    const timeout = setTimeout(
-      () => setShouldRender(false),
-      CLOSE_ANIMATION_MS,
-    );
+    setConfirmingClear(false);
+    if (clearConfirmTimeoutRef.current) clearTimeout(clearConfirmTimeoutRef.current);
+    const timeout = setTimeout(() => setShouldRender(false), CLOSE_ANIMATION_MS);
     return () => clearTimeout(timeout);
   }, [isOpen]);
 
@@ -145,21 +164,13 @@ export const ScorecardModal: React.FC<ScorecardModalProps> = ({
     if (!onChange) return;
     onChange({
       yourName,
-      left: {
-        name: leftName,
-        rows: leftRows,
-        subtotalA: leftSubA,
-        subtotalB: leftSubB,
-      },
-      right: {
-        name: rightName,
-        rows: rightRows,
-        subtotalA: rightSubA,
-        subtotalB: rightSubB,
-      },
+      total,
+      left: { name: leftName, rows: leftRows, subtotalA: leftSubA, subtotalB: leftSubB },
+      right: { name: rightName, rows: rightRows, subtotalA: rightSubA, subtotalB: rightSubB },
     });
   }, [
     yourName,
+    total,
     leftName,
     leftRows,
     leftSubA,
@@ -171,57 +182,57 @@ export const ScorecardModal: React.FC<ScorecardModalProps> = ({
     onChange,
   ]);
 
-  useEffect(() => {
-    setLeftSubB(
-      leftRows
-        .reduce((total, row) => {
-          return total + Number(row.pts) || 0;
-        }, 0)
-        .toString(),
-    );
-    setRightSubB(
-      rightRows
-        .reduce((total, row) => {
-          return total + Number(row.pts) || 0;
-        }, 0)
-        .toString(),
-    );
-  }, [leftRows, rightRows]);
-
   const handleOverlayClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       if (e.target === overlayRef.current) onClose();
     },
-    [onClose],
+    [onClose]
   );
+
+  const clearAllWordsAndScores = useCallback(() => {
+    setLeftRows(emptyRows(numRows));
+    setRightRows(emptyRows(numRows));
+    setLeftSubB("");
+    setRightSubB("");
+  }, [numRows]);
+
+  const handleClearClick = useCallback(() => {
+    if (!confirmingClear) {
+      setConfirmingClear(true);
+      clearConfirmTimeoutRef.current = setTimeout(() => setConfirmingClear(false), 3000);
+      return;
+    }
+    if (clearConfirmTimeoutRef.current) clearTimeout(clearConfirmTimeoutRef.current);
+    setConfirmingClear(false);
+    clearAllWordsAndScores();
+  }, [confirmingClear, clearAllWordsAndScores]);
 
   const updateRow = (
     side: "left" | "right",
     index: number,
     field: "guess" | "pts",
-    value: string,
+    value: string
   ) => {
     const setRows = side === "left" ? setLeftRows : setRightRows;
     setRows((prev) =>
-      prev.map((row, i) => (i === index ? { ...row, [field]: value } : row)),
+      prev.map((row, i) => (i === index ? { ...row, [field]: value } : row))
     );
   };
 
   const handlePtsChange = (
     side: "left" | "right",
     index: number,
-    raw: string,
+    raw: string
   ) => {
     // Allow empty string, optional leading minus, and digits only.
     if (raw === "" || /^-?\d*$/.test(raw)) {
       updateRow(side, index, "pts", raw);
     }
-    // update subA
   };
 
   const handleNumericChange = (
     setter: React.Dispatch<React.SetStateAction<string>>,
-    raw: string,
+    raw: string
   ) => {
     if (raw === "" || /^-?\d*$/.test(raw)) {
       setter(raw);
@@ -236,7 +247,6 @@ export const ScorecardModal: React.FC<ScorecardModalProps> = ({
     const setName = isLeft ? setLeftName : setRightName;
     const rows = isLeft ? leftRows : rightRows;
     const subA = isLeft ? leftSubA : rightSubA;
-    const setSubA = isLeft ? setLeftSubA : setRightSubA;
     const subB = isLeft ? leftSubB : rightSubB;
     const setSubB = isLeft ? setLeftSubB : setRightSubB;
 
@@ -259,9 +269,10 @@ export const ScorecardModal: React.FC<ScorecardModalProps> = ({
         <div className="sc-subheader">
           <span className="sc-subheader-label">Guess</span>
           <span className="sc-subheader-line" aria-hidden="true" />
-          <span className="sc-subheader-label sc-subheader-label--pts">
-            Pts
+          <span className="sc-subheader-label sc-subheader-label--letters">
+            #
           </span>
+          <span className="sc-subheader-label sc-subheader-label--pts">Pts</span>
         </div>
 
         <div className="sc-rows">
@@ -273,6 +284,14 @@ export const ScorecardModal: React.FC<ScorecardModalProps> = ({
                 value={row.guess}
                 onChange={(e) => updateRow(side, i, "guess", e.target.value)}
                 aria-label={`Player ${isLeft ? "left" : "right"} guess ${i + 1}`}
+              />
+              <input
+                type="text"
+                readOnly
+                tabIndex={-1}
+                className="sc-letters-input"
+                value={countLetters(row.guess)}
+                aria-label={`Player ${isLeft ? "left" : "right"} letter count ${i + 1}`}
               />
               <input
                 type="text"
@@ -289,11 +308,12 @@ export const ScorecardModal: React.FC<ScorecardModalProps> = ({
         <div className={`sc-subtotal-row sc-subtotal-row--${side}`}>
           <input
             type="text"
-            inputMode="numeric"
-            className="sc-subtotal-input"
+            readOnly
+            tabIndex={-1}
+            className="sc-subtotal-input sc-subtotal-input--auto"
             value={subA}
-            onChange={(e) => handleNumericChange(setSubA, e.target.value)}
-            aria-label={`Player ${isLeft ? "left" : "right"} subtotal A`}
+            title="Automatically calculated: sum of this column's Pts"
+            aria-label={`Player ${isLeft ? "left" : "right"} subtotal A (auto-calculated)`}
           />
           <span className="sc-plus">+</span>
           <input
@@ -322,6 +342,19 @@ export const ScorecardModal: React.FC<ScorecardModalProps> = ({
         aria-modal="true"
         aria-label="Scorecard"
       >
+        <button
+          type="button"
+          className={`sc-clear-btn${confirmingClear ? " sc-clear-btn--confirm" : ""}`}
+          onClick={handleClearClick}
+          aria-label={
+            confirmingClear
+              ? "Click again to confirm clearing all guesses and points"
+              : "Clear all guesses and points"
+          }
+        >
+          {confirmingClear ? "Sure?" : "Clear"}
+        </button>
+
         <button
           type="button"
           className="sc-close-btn"
@@ -364,15 +397,12 @@ export const ScorecardModal: React.FC<ScorecardModalProps> = ({
             <span className="sc-footer-label">Total</span>
             <input
               type="text"
-              inputMode="numeric"
+              readOnly
+              tabIndex={-1}
               className="sc-footer-input sc-footer-input--total"
-              value={
-                Number(leftSubA) +
-                Number(leftSubB) +
-                Number(rightSubA) +
-                Number(rightSubB)
-              }
-              aria-label="Total"
+              value={total}
+              title="Automatically calculated: sum of all four subtotals"
+              aria-label="Total (auto-calculated)"
             />
           </label>
         </div>

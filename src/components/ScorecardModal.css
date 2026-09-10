@@ -18,9 +18,7 @@
   justify-content: center;
   padding: 24px;
   z-index: 1000;
-  transition:
-    background-color 0.28s ease,
-    backdrop-filter 0.28s ease;
+  transition: background-color 0.28s ease, backdrop-filter 0.28s ease;
 }
 
 .sc-overlay--visible {
@@ -42,8 +40,7 @@
   /* Hidden state: slid down below its resting position and faded out. */
   opacity: 0;
   transform: translateY(64px);
-  transition:
-    transform 0.28s cubic-bezier(0.22, 0.9, 0.32, 1),
+  transition: transform 0.28s cubic-bezier(0.22, 0.9, 0.32, 1),
     opacity 0.22s ease;
 }
 
@@ -78,9 +75,7 @@
   line-height: 1;
   cursor: pointer;
   border-radius: 50%;
-  transition:
-    background 0.15s ease,
-    color 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .sc-close-btn:hover,
@@ -88,6 +83,43 @@
   background: var(--sc-placeholder);
   color: var(--sc-ink);
   outline: none;
+}
+
+.sc-clear-btn {
+  position: absolute;
+  top: 10px;
+  left: 14px;
+  z-index: 5;
+  height: 30px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 15px;
+  background: transparent;
+  color: var(--sc-ink-soft);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sc-clear-btn:hover,
+.sc-clear-btn:focus-visible {
+  background: var(--sc-placeholder);
+  color: var(--sc-ink);
+  outline: none;
+}
+
+.sc-clear-btn--confirm {
+  background: #fdecea;
+  color: #c23b3b;
+}
+
+.sc-clear-btn--confirm:hover,
+.sc-clear-btn--confirm:focus-visible {
+  background: #f9d9d6;
+  color: #a92e2e;
 }
 
 .sc-body {
@@ -156,7 +188,7 @@
   border: none;
   border-radius: 4px;
   padding: 8px 10px;
-  font-size: 14px;
+  font-size: 16px;
   color: var(--sc-ink);
   text-align: center;
   font-weight: 600;
@@ -189,8 +221,14 @@
   flex-shrink: 0;
 }
 
+.sc-subheader-label--letters {
+  width: 34px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
 .sc-subheader-label--pts {
-  margin-left: auto;
+  flex-shrink: 0;
 }
 
 .sc-subheader-line {
@@ -233,19 +271,37 @@
   flex: 1;
   min-width: 0;
   border: none;
-  border-right: 2px dashed var(--sc-ink);
+  border-right: 1px solid rgba(73, 52, 166, 0.3);
   padding: 12px 10px;
-  font-size: 14px;
+  font-size: 16px;
   color: #2a2050;
   background: transparent;
 }
 
+.sc-letters-input {
+  width: 34px;
+  flex-shrink: 0;
+  border: none;
+  border-right: 2px dashed var(--sc-ink);
+  padding: 12px 2px;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--sc-ink-soft);
+  background: rgba(227, 221, 244, 0.45);
+  cursor: default;
+}
+
+.sc-letters-input:focus {
+  outline: none;
+}
+
 .sc-pts-input {
-  width: 58px;
+  width: 62px;
   flex-shrink: 0;
   border: none;
   padding: 12px 6px;
-  font-size: 14px;
+  font-size: 16px;
   text-align: center;
   color: #2a2050;
   background: transparent;
@@ -281,6 +337,17 @@
 .sc-subtotal-input:focus {
   outline: none;
   background: var(--sc-placeholder);
+}
+
+.sc-subtotal-input--auto {
+  background: rgba(227, 221, 244, 0.55);
+  color: var(--sc-ink-soft);
+  cursor: default;
+}
+
+.sc-subtotal-input--auto:focus {
+  background: rgba(227, 221, 244, 0.55);
+  outline: none;
 }
 
 .sc-plus {
@@ -326,7 +393,7 @@
   border: none;
   border-radius: 4px;
   padding: 9px 10px;
-  font-size: 14px;
+  font-size: 16px;
   color: #2a2050;
   background: #ffffff;
 }
@@ -345,6 +412,11 @@
 .sc-footer-input:focus {
   outline: 2px solid #ffffff;
   outline-offset: 1px;
+}
+
+.sc-footer-input[readonly] {
+  cursor: default;
+  opacity: 0.9;
 }
 
 @media (prefers-reduced-motion: reduce) {
